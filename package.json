@@ -1,0 +1,25 @@
+{
+  "name": "docker_web_app",
+  "version": "1.0.0",
+  "description": "Node.js on Docker",
+  "author": "Unai Zulaika <unai.zulaika@deusto.es>",
+  "main": "server.js",
+  "scripts": {
+    "start": "pm2 start src/server.js",
+    "dev": "pm2 start src/server.js --watch --attach",
+    "prod": "pm2-runtime src/server.js",
+    "pretest": "eslint --ignore-path .gitignore ."
+  },
+  "dependencies": {
+    "bcrypt": "^3.0.6",
+    "express": "^4.16.1",
+    "mongoose": "^5.5.9",
+    "pm2": "^3.5.0",
+    "swagger-ui-express": "^4.0.4",
+    "ws": "^7.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-strongloop": "^2.1.0"
+  }
+}
