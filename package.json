@@ -12,7 +12,9 @@
   },
   "dependencies": {
     "bcrypt": "^3.0.6",
+    "chalk": "^2.4.2",
     "express": "^4.16.1",
+    "influx": "^5.0.7",
     "mongoose": "^5.5.9",
     "pm2": "^3.5.0",
     "swagger-ui-express": "^4.0.4",

@@ -2,8 +2,9 @@
 
 const router = require('express').Router();
 
-const { getUserConsumption } = require('../../controllers');
+const { controlSmartplug } = require('../../controllers');
 
-router.put('/smartplugs/:id?', getUserConsumption);
+router.get('/smartplugs/on/:id?', controlSmartplug);
+router.get('/smartplugs/off/:id?', controlSmartplug);
 
 module.exports = router;

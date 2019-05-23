@@ -1,7 +1,10 @@
 'use strict';
 
+/*
+************************************
+API server
+*/
 const express = require('express');
-
 const routes = require('./routes');
 
 // Constants
@@ -11,9 +14,6 @@ const HOST = '0.0.0.0';
 // App
 const app = express();
 
-/*
-API server
-*/
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('../swagger.json');
 
@@ -27,19 +27,12 @@ app.get('/', (req, res) => {
 app.listen(PORT, HOST, () => console.log(`Running on http://${HOST}:${PORT}`));
 
 /*
+************************************
 Authorization server
 */
-let mongoose = require('mongoose');
-
-mongoose.connect('mongodb://localhost/test', { useNewUrlParser: true });
-let db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-  // we're connected!
-  console.log('Connected!');
-});
 
 /*
+************************************
 Create websocket
 */
 const WebSocket = require('ws');
