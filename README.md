@@ -1,3 +1,3 @@
-# st_main_server
-
-TODO
+# Variables de entorno necesarioa:
+- MONGODB_URI
+- JWT_SECRET

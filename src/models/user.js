@@ -1,47 +1,36 @@
-'use strict';
+const { Schema, model } = require('mongoose');
+const bcrypt = require('bcryptjs');
 
-const ProfileSchema = require('./profile');
-const DeviceSchema = require('./device');
+const ProfileSchema = require('./profile').schema;
+const DeviceSchema = require('./device').schema;
+const SmartPlugSchema = require('./smartplug').schema;
 
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-var bcrypt = require('bcrypt');
-var SALT_WORK_FACTOR = 10;
-
-var UserSchema = new Schema({
-  username: { type: String, required: true, index: { unique: true } },
-  password: { type: String, required: true },
-  smartplug_id: { type: String, required: true },
-  profile: { type: ProfileSchema, required: true },
-  devices: { type: [DeviceSchema] },
+const UserSchema = new Schema({
+	username: { type: String, required: true },
+	password: { type: String, required: true },
+	anonymous: {type: Boolean, required: true},
+	profile: { type: ProfileSchema },
+	devices: { type: [DeviceSchema] },
+	smartplug: { type: SmartPlugSchema },
 });
 
-UserSchema.pre('save', function(next) {
-  var user = this;
-
-  // only hash the password if it has been modified (or is new)
-  if (!user.isModified('password')) return next();
-
-  // generate a salt
-  bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
-    if (err) return next(err);
-
-    // hash the password using our new salt
-    bcrypt.hash(user.password, salt, function(err, hash) {
-      if (err) return next(err);
-
-      // override the cleartext password with the hashed one
-      user.password = hash;
-      next();
-    });
-  });
+UserSchema.pre('save', async function (next) {
+	try {
+		const salt = await bcrypt.genSalt(10);
+		const passHash = await bcrypt.hash(this.password, salt);
+		this.password = passHash;
+	} catch (err) {
+		next(err);
+	}
 });
 
-UserSchema.methods.comparePassword = function(candidatePassword, cb) {
-  bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
-    if (err) return cb(err);
-    cb(null, isMatch);
-  });
+// Compara la contraseña
+UserSchema.methods.isValidPassword = async function (newPassword) {
+	return await bcrypt
+		.compare(newPassword, this.password)
+		.catch((err) => new Error(err));
 };
 
-module.exports = mongoose.model('User', UserSchema);
+const User = model('User', UserSchema);
+
+module.exports = User;
