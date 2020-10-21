@@ -23,7 +23,6 @@ passport.use(
       passReqToCallback: true
     },
     async (req, payload, done) => {
-      console.log(payload);
       await User.findById(payload.sub)
         .then(user => {
           if (!user) return done(null, false);

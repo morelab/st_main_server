@@ -22,7 +22,7 @@ module.exports = {
       pass: Joi.string().required(),
       anonymous: Joi.boolean().required(),
       name: Joi.string().required(),
-      priv: Joi.string().required(),
+      priv: Joi.number().required(),
       profile: Joi.object()
         .keys({
           age: Joi.number(),

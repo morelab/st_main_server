@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const axios = require('axios');
 
 const User = require('../models/user');
 
@@ -83,16 +84,14 @@ module.exports = {
       firstDay.getTime() / 1000 +
       '&to=' +
       lastDay.getTime() / 1000;
-    console.log(queryMonthly);
     let queryWeekly =
       process.env.INFLUX +
       'power?id=' +
       location +
       '&from=' +
-      (date.getTime() - 604800) / 1000 +
+      (date.getTime() / 1000 - 604800) +
       '&to=' +
       date.getTime() / 1000;
-    console.log(queryWeekly);
     let yesterday =
       new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime() -
       86400000;
@@ -106,21 +105,33 @@ module.exports = {
       'power?id=' +
       location +
       '&from=' +
-      yesterday +
+      yesterday / 1000 +
       '&to=' +
       (today - 1) / 1000;
-    console.log(queryYesterday);
     let queryToday =
       process.env.INFLUX +
       'power?id=' +
       location +
       '&from=' +
-      today +
+      today / 1000 +
       '&to=' +
       (today + 86399999) / 1000;
+    console.log(queryMonthly);
+    console.log(queryWeekly);
+    console.log(queryYesterday);
     console.log(queryToday);
-    console.log();
-    //TODO: Cargar datos de los gráficos y quitar usuario
+    // await axios.get(queryMonthly).then(res => {
+    //   console.log(res.data)
+    // }).catch(err => console.error(err))
+    // await axios.get(queryWeekly).then(res => {
+    //   console.log(res.data)
+    // }).catch(err => console.error(err))
+    // await axios.get(queryYesterday).then(res => {
+    //   console.log(res.data)
+    // }).catch(err => console.error(err))
+    // await axios.get(queryToday).then(res => {
+    //   console.log(res.data)
+    // }).catch(err => console.error(err))
     res.json({
       secret: 'Data',
       user: user
@@ -158,9 +169,8 @@ module.exports = {
     );
     res.json({ success: true });
   },
-  changePassword: async (req, res, next) => {},
+  changePassword: async (req, res, next) => { },
   smartplug: async (req, res, next) => {
-    console.log(req.body.location);
     res.json({ msg: 'hola' });
   },
   logOut: async (req, res, next) => {
