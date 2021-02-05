@@ -12,7 +12,7 @@ const {
   profile,
   deleteProfile,
   changeStatus,
-  changePassword,
+  smartplugSwitch,
   smartplug
 } = require('../controllers/users');
 require('../passport/passport');
@@ -34,7 +34,6 @@ router
 router
   .route('/profile')
   .get(passport.authenticate('jwt', { session: false }), profile)
-  .put(passport.authenticate('jwt', { session: true }), changePassword)
   .delete(passport.authenticate('jwt', { session: false }), deleteProfile);
 router
   .route('/logout')
@@ -49,5 +48,9 @@ router
   .get(passport.authenticate('jwt', { session: false }), changeStatus);
 
 router.route('/clearCookie').post(clearCookie);
+
+router
+  .route('/smartplugSwitch')
+  .get(passport.authenticate('jwt', { session: false }), smartplugSwitch);
 
 module.exports = router;

@@ -1,14 +1,19 @@
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const Etcd = require('node-etcd');
-const etcd = new Etcd('127.0.0.1:2379');
+const etcd = new Etcd(process.env.ETCD);
 
 const User = require('../models/user');
+
+const config = {
+  headers: { 'Content-Type': 'application/json' }
+}
+
 parser = data => {
-  let jump = Math.round(Object.keys(data).length / 1000);
-  let retArray = new Array();
+  let jump = Math.round(Object.keys(data).length / 500);
+  let retArray = [];
   for (let i = 1; i < data.length; i += jump) {
-    let array = new Array();
+    let array = [];
     array.push(parseInt(data[i].t.toString().substring(0, 13)));
     array.push(data[i].v);
     retArray.push(array);
@@ -16,10 +21,10 @@ parser = data => {
   return retArray;
 };
 parserYesterday = data => {
-  let jump = Math.round(Object.keys(data).length / 5000);
-  let retArray = new Array();
+  let jump = Math.round(Object.keys(data).length / 500);
+  let retArray = [];
   for (let i = 1; i < data.length; i += jump) {
-    let array = new Array();
+    let array = [];
     array.push(parseInt(data[i].t.toString().substring(0, 13) + 86400));
     array.push(data[i].v);
     retArray.push(array);
@@ -90,6 +95,15 @@ module.exports = {
   },
 
   dashboard: async (req, res, next) => {
+    let equivalence;
+    await axios.post(process.env.EQUIVALENCIA, { ubicacion: req.user.smartplug.location }, config)
+      .then(response => {
+        const { msg } = response.data;
+        equivalence = msg
+      })
+      .catch(err => {
+        console.log(err);
+      })
     const username = req.user.username;
     const devices = req.user.devices;
     const smartplug = req.user.smartplug;
@@ -146,47 +160,46 @@ module.exports = {
       today / 1000 +
       '&to=' +
       (today + 86399999) / 1000;
-    var monthData;
-    var weekData;
-    var yesterdayData;
-    var todayData;
-    console.log(queryMonthly);
+    let monthData;
+    let weekData;
+    let yesterdayData;
+    let todayData;
     await axios
       .get(queryMonthly)
       .then(res => {
         monthData = parser(res.data);
-        console.log(monthData);
       })
-      .catch(err => console.error(err));
+      .catch(err => console.log(err));
     await axios
       .get(queryWeekly)
       .then(res => {
         weekData = parser(res.data);
       })
-      .catch(err => console.error(err));
+      .catch(err => console.log(err));
     await axios
       .get(queryYesterday)
       .then(res => {
         yesterdayData = parserYesterday(res.data);
       })
-      .catch(err => console.error(err));
+      .catch(err => console.log(err));
     await axios
       .get(queryToday)
       .then(res => {
         todayData = parser(res.data);
       })
-      .catch(err => console.error(err));
-    res.json({
+      .catch(err => console.log(err));
+    res.status(200).json({
       monthData,
       weekData,
       yesterdayData,
       todayData,
-      user: user
+      user: user,
+      equivalence
     });
   },
 
   profile: async (req, res, next) => {
-    var username;
+    let username;
     if (req.user.anonymous === false) {
       username = req.user.name;
     } else {
@@ -201,13 +214,12 @@ module.exports = {
     });
   },
   deleteProfile: async (req, res, next) => {
-    console.log(req.user);
     await User.findByIdAndRemove(req.user._id);
     await res.clearCookie('access_token');
     return res.json({ success: true });
   },
   changeStatus: async (req, res, nex) => {
-    var anonymous = !req.user.anonymous;
+    const anonymous = !req.user.anonymous;
     await User.findByIdAndUpdate(
       req.user.id,
       {
@@ -217,7 +229,6 @@ module.exports = {
     );
     res.json({ success: true });
   },
-  changePassword: async (req, res, next) => {},
   smartplug: async (req, res, next) => {
     const checkLocation = await User.findOne({
       'smartplug.location': req.body.location
@@ -231,6 +242,7 @@ module.exports = {
       if (err === null) {
         res.status(200).json({ alias: etcdRes.node.value });
       } else {
+        console.log(err)
         res.status(406).json({ err: 'No location found' });
       }
     });
@@ -241,7 +253,7 @@ module.exports = {
   },
 
   checkAuth: async (req, res, next) => {
-    res.json({
+    res.status(200).json({
       success: true
     });
   },
@@ -249,5 +261,51 @@ module.exports = {
   clearCookie: async (req, res, next) => {
     await res.clearCookie('access_token');
     res.json({ success: true });
+  },
+
+  smartplugSwitch: async (req, res, next) => {
+    const location = req.user.smartplug.location;
+    const smartplug = {
+      _id: req.user.smartplug._id,
+      in_use: !req.user.smartplug.in_use,
+      location: req.user.smartplug.location,
+      name: req.user.smartplug.name
+    }
+
+    if (req.user.smartplug.in_use) {
+      axios.post(process.env.APAGAR, { ubicacion: location }, config)
+        .then(async () => {
+            await User.findByIdAndUpdate(
+              req.user.id,
+              {
+                smartplug,
+              },
+              { new: true }
+            )
+            res.status(200).json({ success: true })
+          }
+        )
+        .catch(err => {
+          console.log(err);
+          res.status(500).json({ success: false })
+        });
+    } else {
+      await axios.post(process.env.ENCENDER, { ubicacion: location }, config)
+        .then(async () => {
+            await User.findByIdAndUpdate(
+              req.user.id,
+              {
+                smartplug,
+              },
+              { new: true }
+            )
+            res.status(200).json({ success: true })
+          }
+        )
+        .catch(err => {
+          console.log(err);
+          res.status(500).json({ success: false })
+        });
+    }
   }
 };
