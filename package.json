@@ -100,10 +100,10 @@
     "start": "node build/index.js",
     "dev": "nodemon src/index.ts",
     "local": "npm run build && node build/index.js",
-    "test": "cross-env NODE_ENV=test mocha --timeout 5000 --slow -1 -r ts-node/register 'test/**/*.test.ts'",
-    "report": "cross-env NODE_ENV=test nyc --reporter=lcov mocha --slow -1 -r ts-node/register --timeout 5000 'test/**/*.test.ts'",
-    "text-report": "cross-env NODE_ENV=test nyc --reporter=text-summary mocha --slow -1 -r ts-node/register --timeout 5000 'test/**/*.test.ts'",
-    "nyc": "cross-env NODE_ENV=test nyc mocha -r ts-node/register --slow -1 --timeout 5000 'test/**/*.test.ts'",
+    "test": "cross-env NODE_ENV=test mocha --timeout 5000 --exit --slow -1 -r ts-node/register 'test/**/*.test.ts'",
+    "report": "cross-env NODE_ENV=test nyc --reporter=lcov mocha --exit --slow -1 -r ts-node/register --timeout 5000 'test/**/*.test.ts'",
+    "text-report": "cross-env NODE_ENV=test nyc --reporter=text-summary mocha --exit --slow -1 -r ts-node/register --timeout 5000 'test/**/*.test.ts'",
+    "nyc": "cross-env NODE_ENV=test nyc mocha -r ts-node/register --exit --slow -1 --timeout 5000 'test/**/*.test.ts'",
     "codecov": "nyc report --reporter=json"
   },
   "version": "1.0.0"
