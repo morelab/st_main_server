@@ -1,0 +1,16 @@
+language: node_js
+install:
+  - npm install
+script:
+  - npm install codecov -g
+  - npm run nyc
+  - npm run codecov
+  - codecov -f test/report/*.json
+env:
+  - CODECOV_TOKEN='98437c4b-4c56-4a4b-898a-8fd0f430b35f'
+after_success:
+  - codecov
+node_js:
+  - 12
+  - 14
+services: mongodb

@@ -1,15 +1,15 @@
-  
-#Fichero de configuración para el estilo.
-# top-most EditorConfig file
 root = true
-
-# Unix-style newlines with a newline ending every file
 [*]
-end_of_line = unset
+end_of_line = lf
 insert_final_newline = true
-trim_trailing_whitespace = true
+[*.{js,py}]
 charset = utf-8
+[lib/**.js]
 indent_style = space
 indent_size = 2
-insert_final_newline = false
-trim_trailing_whitespace = false
+[{package.json,.travis.yml}]
+indent_style = space
+indent_size = 2
+[*.{ts,json}]
+indent_style = space
+indent_size = 2
