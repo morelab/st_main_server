@@ -1,0 +1,38 @@
+name: st_main_server CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo
+        ports: 
+          - 27017:27017
+    strategy:
+      matrix:
+        node-version: [12.x, 14.x, 15.x]
+    env: 
+      CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: install codecov
+      run: npm install codecov -g
+    - name: install dependencies
+      run: npm install
+    - name: run tests
+      run: npm run nyc
+    - name: run codecov
+      run: npm run codecov
+    - name: publish to codecov
+      run: codecov -f test/report/*.json
+          echo test, and deploy your project.
