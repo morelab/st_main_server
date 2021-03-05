@@ -1,5 +1,10 @@
 <!-- @format -->
 
+[![TypeScript version](https://img.shields.io/badge/TypeScript-4.1.5-%233178c6)](https://github.com/microsoft/TypeScript/releases/tag/v4.1.5)
+[![Style](https://img.shields.io/badge/style-airbnb-%23F05B5F)](https://github.com/airbnb/javascript)
+[![st_main_server CI](https://github.com/morelab/st_main_server/actions/workflows/node.js.yml/badge.svg)](https://github.com/morelab/st_main_server/actions/workflows/node.js.yml)
+[![codecov](https://codecov.io/gh/morelab/st_main_server/branch/master/graph/badge.svg?token=7tDZMrZSeJ)](https://codecov.io/gh/morelab/st_main_server)
+
 # Sentient Things main server
 
 ## Description
