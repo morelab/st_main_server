@@ -35,4 +35,3 @@ jobs:
       run: npm run codecov
     - name: publish to codecov
       run: codecov -f test/report/*.json
-          echo test, and deploy your project.
